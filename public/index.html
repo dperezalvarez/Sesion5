@@ -1,9 +1,13 @@
 <!DOCTYPE html>
+<!-- Esto define que el documento es HTML5 -->
 <html lang="es">
 <head>
+  <!-- Establecemos el conjunto de caracteres como UTF-8 para soportar todos los caracteres (incluyendo acentos) -->
   <meta charset="UTF-8">
+  <!-- Esto asegura que el diseño se ajuste correctamente en dispositivos móviles -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CRUD de Productos</title>
+  <!-- Estilos simples para mejorar la apariencia de la página -->
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -34,94 +38,123 @@
   </style>
 </head>
 <body>
+  <!-- Título principal de la página -->
   <h1>Gestión de Productos</h1>
 
-  <!-- Formulario para crear un producto -->
+  <!-- Formulario para crear un nuevo producto -->
   <h2>Crear nuevo producto</h2>
   <form id="productForm">
+    <!-- Campo de texto para ingresar el nombre del producto -->
     <label for="name">Nombre:</label>
     <input type="text" id="name" name="name" required>
 
+    <!-- Campo numérico para ingresar el precio del producto -->
     <label for="price">Precio:</label>
     <input type="number" id="price" name="price" required>
 
+    <!-- Área de texto para ingresar la descripción del producto -->
     <label for="description">Descripción:</label>
     <textarea id="description" name="description" rows="4" required></textarea>
 
+    <!-- Botón para enviar el formulario y crear el producto -->
     <button type="submit">Crear Producto</button>
   </form>
 
   <hr>
 
-  <!-- Tabla para mostrar los productos -->
+  <!-- Sección para mostrar la lista de productos existentes -->
   <h2>Lista de productos</h2>
+  <!-- Botón para cargar los productos desde el servidor -->
   <button id="loadProductsBtn">Cargar productos</button>
+  <!-- Tabla donde se mostrarán los productos -->
   <table id="productsTable">
     <thead>
       <tr>
+        <!-- Encabezado de la tabla -->
         <th>Nombre</th>
         <th>Precio</th>
         <th>Descripción</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody>
+      <!-- Aquí se insertarán las filas con los productos -->
+    </tbody>
   </table>
 
+  <!-- Inicio del bloque de JavaScript -->
   <script>
-    // Enviar una solicitud POST para crear un producto
+    // Aquí se agrega funcionalidad para manejar el formulario y las solicitudes al servidor
+
+    // Capturamos el evento 'submit' (cuando se envía el formulario)
     document.getElementById('productForm').addEventListener('submit', function (event) {
+      // Prevenimos que el formulario se envíe de manera tradicional (recargando la página)
       event.preventDefault();
+
+      // Obtenemos los valores ingresados en los campos de texto del formulario
       const name = document.getElementById('name').value;
       const price = document.getElementById('price').value;
       const description = document.getElementById('description').value;
 
+      // Creamos un objeto JavaScript que contiene los datos del nuevo producto
       const productData = {
-        nombre: name,
-        precio: price,
-        descripcion: description
+        nombre: name,         // Aquí el nombre del producto
+        precio: price,        // Aquí el precio del producto
+        descripcion: description // Aquí la descripción del producto
       };
 
-      fetch('http://localhost:3000/productos', {
-        method: 'POST',
+      // Enviamos una solicitud POST al servidor para crear un nuevo producto
+      fetch('https://localhost:3000/productos', { // La URL a la que enviamos la solicitud
+        method: 'POST',                           // Método HTTP utilizado (POST para enviar datos)
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json'      // Indicamos que los datos se envían en formato JSON
         },
-        body: JSON.stringify(productData)
+        body: JSON.stringify(productData)         // Convertimos el objeto 'productData' a formato JSON
       })
-      .then(response => response.json())
+      .then(response => response.json())          // Esperamos la respuesta del servidor y la convertimos a JSON
       .then(data => {
+        // Mostramos un mensaje de éxito cuando el producto se crea correctamente
         alert('Producto creado con éxito');
-        document.getElementById('productForm').reset(); // Limpiar el formulario
+        // Limpiamos el formulario después de crear el producto
+        document.getElementById('productForm').reset();
       })
       .catch(error => {
+        // Mostramos un mensaje de error si algo falla
         console.error('Error:', error);
         alert('Ocurrió un error al crear el producto');
       });
     });
 
-    // Enviar una solicitud GET para obtener la lista de productos
+    // Cuando se hace clic en el botón de "Cargar productos"
     document.getElementById('loadProductsBtn').addEventListener('click', function () {
-      fetch('http://localhost:3000/productos')
-        .then(response => response.json())
+      // Enviamos una solicitud GET al servidor para obtener la lista de productos
+      fetch('https://localhost:3000/productos')  // La URL para obtener los productos
+        .then(response => response.json())       // Convertimos la respuesta a formato JSON
         .then(data => {
+          // Seleccionamos el cuerpo de la tabla donde se mostrarán los productos
           const tableBody = document.querySelector('#productsTable tbody');
-          tableBody.innerHTML = ''; // Limpiar la tabla
+          tableBody.innerHTML = ''; // Limpiamos la tabla antes de agregar los productos
 
+          // Recorremos los productos que nos envió el servidor
           data.forEach(product => {
+            // Creamos una nueva fila en la tabla por cada producto
             const row = document.createElement('tr');
+            // Insertamos los valores del producto en la fila
             row.innerHTML = `
-              <td>${product.nombre}</td>
-              <td>${product.precio}</td>
-              <td>${product.descripcion}</td>
+              <td>${product.nombre}</td>          <!-- Nombre del producto -->
+              <td>${product.precio}</td>          <!-- Precio del producto -->
+              <td>${product.descripcion}</td>     <!-- Descripción del producto -->
             `;
+            // Añadimos la nueva fila al cuerpo de la tabla
             tableBody.appendChild(row);
           });
         })
         .catch(error => {
+          // Si ocurre un error al cargar los productos, mostramos un mensaje
           console.error('Error:', error);
           alert('Ocurrió un error al cargar los productos');
         });
     });
   </script>
+  <!-- Fin del bloque de JavaScript -->
 </body>
 </html>
